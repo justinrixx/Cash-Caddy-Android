@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "67801541537",
+    "firebase_url": "https://cash-caddy-d99d1.firebaseio.com",
+    "project_id": "cash-caddy-d99d1",
+    "storage_bucket": "cash-caddy-d99d1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67801541537:android:33af0e99d4715547",
+        "android_client_info": {
+          "package_name": "com.gmail.rixx.justin.cashcaddy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "67801541537-k0u353ivrrjds5nv9l6dqhqco4scftr2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJql4PO_Z_sfDINhLx44P6o2BwWUPoK8c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
