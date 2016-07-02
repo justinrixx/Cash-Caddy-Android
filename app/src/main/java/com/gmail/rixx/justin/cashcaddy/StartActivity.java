@@ -73,7 +73,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
      * Starts an activity to get the user signed up
      */
     private void signUp() {
-        Toast.makeText(this, "Sign up", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, SignUpActivity.class));
     }
 
     /**
