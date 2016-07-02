@@ -26,15 +26,10 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    // constants
-    private static final int RC_SIGN_IN = 100;
-
     // widgets
     private FloatingActionButton fab;
     private DrawerLayout drawer;
     private NavigationView mNavigationView;
-    private Button signInButton;
-    private Button signUpButton;
     private RecyclerView mRecycler;
 
     // auth stuff
@@ -57,8 +52,6 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        signInButton = (Button) findViewById(R.id.btn_signIn);
-        signUpButton = (Button) findViewById(R.id.btn_signUp);
         mRecycler = (RecyclerView) findViewById(R.id.recyclerView);
         mAuth = FirebaseAuth.getInstance();
 
@@ -70,56 +63,20 @@ public class MainActivity extends AppCompatActivity
      */
     private void setListeners() {
 
-        // click listeners for the buttons
-        signInButton.setOnClickListener(this);
-        signUpButton.setOnClickListener(this);
         fab.setOnClickListener(this);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
         // listen for auth state changes
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    userLoggedIn(true);
-                } else {
-                    userLoggedIn(false);
+                if (user == null) {
+                    // user can't be here if not logged in
+                    finish();
                 }
             }
         };
-    }
-
-    /**
-     * Toggle all the stuff that should be visible when the auth state changes
-     * @param loggedIn Whether or not the user is logged in
-     */
-    private void userLoggedIn(boolean loggedIn) {
-
-        if (loggedIn) {
-            // hide the sign up and sign in buttons
-            signInButton.setVisibility(View.GONE);
-            signUpButton.setVisibility(View.GONE);
-
-            // put listeners on the fab and navigation view
-            mNavigationView.setNavigationItemSelectedListener(this);
-
-            // show the fab and the recycler
-            mRecycler.setVisibility(View.VISIBLE);
-            fab.setVisibility(View.VISIBLE);
-
-            // set up the recycler
-        } else {
-            // hide the recycler and fab
-            fab.setVisibility(View.GONE);
-            mRecycler.setVisibility(View.GONE);
-
-            // remove the listener
-            mNavigationView.setNavigationItemSelectedListener(null);
-
-            // show the sign in and sign up buttons
-            signInButton.setVisibility(View.VISIBLE);
-            signUpButton.setVisibility(View.VISIBLE);
-        }
     }
 
     /**
@@ -127,16 +84,6 @@ public class MainActivity extends AppCompatActivity
      */
     private void addTransaction() {
         Snackbar.make(fab, "No functionality for this yet", Snackbar.LENGTH_SHORT).show();
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                // user is signed in
-                Toast.makeText(this, "Signed in!", Toast.LENGTH_LONG).show();
-            }
-        }
     }
 
     @Override
@@ -203,34 +150,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()) {
-            case R.id.fab:
-                addTransaction();
-                break;
-            case R.id.btn_signIn:
-                signIn();
-                break;
-            case R.id.btn_signUp:
-                signUp();
-                break;
+        if (v.getId() == R.id.fab) {
+            addTransaction();
         }
-    }
-
-    /**
-     * Starts an activity to get the user signed up
-     */
-    private void signUp() {
-        Toast.makeText(this, "Sign up", Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * Kicks off FirebaseUI to sign the user in
-     */
-    private void signIn() {
-
-        startActivityForResult(
-                AuthUI.getInstance().createSignInIntentBuilder().build(),
-                RC_SIGN_IN);
     }
 
     @Override
