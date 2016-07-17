@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity
             protected void populateViewHolder(CategoryHolder viewHolder, Category model, int position) {
                 viewHolder.setName(model.getName());
                 viewHolder.setBalance(model.getBalance());
+                viewHolder.setBackground(position);
             }
         };
 
@@ -212,7 +213,9 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
 
-        mAdapter.cleanup();
+        if (mAdapter != null) {
+            mAdapter.cleanup();
+        }
     }
 
     /**
@@ -243,6 +246,15 @@ public class MainActivity extends AppCompatActivity
                 field.setTextColor(mView.getContext().getResources().getColor(R.color.red));
             } else {
                 field.setTextColor(mView.getContext().getResources().getColor(android.R.color.holo_green_dark));
+            }
+        }
+
+        // alternate background colors
+        public void setBackground(int index) {
+            if (index % 2 == 0) {
+                mView.setBackgroundColor(mView.getResources().getColor(R.color.stripeLight));
+            } else {
+                mView.setBackgroundColor(mView.getResources().getColor(R.color.stripe));
             }
         }
     }
