@@ -1,7 +1,6 @@
 package com.gmail.rixx.justin.cashcaddy;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -43,6 +42,7 @@ public class MainActivity extends AppCompatActivity
     private NavigationView mNavigationView;
     private RecyclerView mRecycler;
     private FirebaseRecyclerAdapter mAdapter;
+    private TextView emailTextView;
 
     // auth stuff
     private FirebaseAuth mAuth;
@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mRecycler = (RecyclerView) findViewById(R.id.recyclerView);
+        emailTextView = (TextView) (mNavigationView.getHeaderView(0).findViewById(R.id.email_text_view));
         mAuth = FirebaseAuth.getInstance();
 
         setListeners();
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     uid = user.getUid();
                     setUpRecycler();
+                    emailTextView.setText(user.getEmail());
                 }
             }
         };
