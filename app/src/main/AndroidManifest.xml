@@ -35,6 +35,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gmail.rixx.justin.cashcaddy.StartActivity" />
         </activity>
+        <activity
+            android:name=".EditCategories"
+            android:label="@string/title_activity_edit_categories"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

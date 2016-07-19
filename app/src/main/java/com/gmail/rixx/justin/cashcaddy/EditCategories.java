@@ -7,6 +7,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
@@ -32,8 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-
-public class MainActivity extends AppCompatActivity
+public class EditCategories extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     // widgets
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_edit_categories);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             protected void populateViewHolder(CategoryHolder viewHolder, Category model, int position) {
                 viewHolder.setName(model.getName());
-                viewHolder.setBalance(model.getBalance());
+                viewHolder.setAmount(model.getAmount());
                 viewHolder.setBackground(position);
             }
         };
@@ -119,19 +119,33 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
-    /**
-     * Start the add transaction activity
-     */
-    private void addTransaction() {
-        Snackbar.make(fab, "No functionality for this yet", Snackbar.LENGTH_SHORT).show();
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mAdapter != null) {
+            mAdapter.cleanup();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        if (drawer == null) {
-            drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        }
-        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -141,7 +155,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.edit_categories, menu);
         return true;
     }
 
@@ -167,17 +181,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            return true;
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
         } else if (id == R.id.nav_manage) {
-            // go to the edit categories activity
-            startActivity(new Intent(this, EditCategories.class));
+            return true;
         } else if (id == R.id.nav_logout) {
             AuthUI.getInstance(FirebaseApp.getInstance())
-                    .signOut(MainActivity.this)
+                    .signOut(EditCategories.this)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         public void onComplete(@NonNull Task<Void> task) {
                             // user is now signed out
-                            startActivity(new Intent(MainActivity.this, StartActivity.class));
+                            startActivity(new Intent(EditCategories.this, StartActivity.class));
                             finish();
                         }
                     });
@@ -192,33 +206,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-
-        if (v.getId() == R.id.fab) {
-            addTransaction();
+        switch (v.getId()) {
+            case R.id.fab: {
+                addCategory();
+            }
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (mAdapter != null) {
-            mAdapter.cleanup();
-        }
+    private void addCategory() {
+        Snackbar.make(fab, "Can't add categories yet", Snackbar.LENGTH_LONG).show();
     }
 
     /**
@@ -237,7 +233,7 @@ public class MainActivity extends AppCompatActivity
             field.setText(name);
         }
 
-        public void setBalance(int balance) {
+        public void setAmount(int balance) {
             TextView field = (TextView) mView.findViewById(R.id.category_balance);
 
             NumberFormat n = NumberFormat.getCurrencyInstance(Locale.US);
