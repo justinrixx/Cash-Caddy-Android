@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -35,6 +36,9 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+
+    // constants
+    public static final String EXTRA_CATEGORY_ID = "category_id";
 
     // widgets
     private FloatingActionButton fab;
@@ -88,6 +92,15 @@ public class MainActivity extends AppCompatActivity
                 viewHolder.setName(model.getName());
                 viewHolder.setBalance(model.getBalance());
                 viewHolder.setBackground(position);
+                viewHolder.setClickListener(model.getKey());
+            }
+
+            // so I can get the key too
+            @Override
+            protected Category parseSnapshot(DataSnapshot snapshot) {
+                Category result = super.parseSnapshot(snapshot);
+                result.setKey(snapshot.getKey());
+                return result;
             }
         };
 
@@ -259,6 +272,18 @@ public class MainActivity extends AppCompatActivity
             } else {
                 mView.setBackgroundColor(mView.getResources().getColor(R.color.stripe));
             }
+        }
+
+        public void setClickListener(final String category) {
+            mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(v.getContext(), ViewTransactions.class);
+                    i.putExtra(EXTRA_CATEGORY_ID, category);
+
+                    v.getContext().startActivity(i);
+                }
+            });
         }
     }
 }

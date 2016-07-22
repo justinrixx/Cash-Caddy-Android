@@ -38,7 +38,16 @@
         <activity
             android:name=".EditCategories"
             android:label="@string/title_activity_edit_categories"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ViewTransactions"
+            android:label="@string/title_activity_view_transactions"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gmail.rixx.justin.cashcaddy.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

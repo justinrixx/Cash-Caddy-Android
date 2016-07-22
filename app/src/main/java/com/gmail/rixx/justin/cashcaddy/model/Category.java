@@ -1,7 +1,11 @@
 package com.gmail.rixx.justin.cashcaddy.model;
 
+import com.google.firebase.database.Exclude;
+
 /**
  * Just a POJO to use FirebaseUI
+ * https://github.com/firebase/FirebaseUI-Android/issues/72
+ * https://firebase.google.com/support/guides/firebase-android (@JsonIgnore)
  */
 public class Category {
 
@@ -10,6 +14,9 @@ public class Category {
     private String lastRefresh;
     private String name;
     private String refreshCode;
+
+    @Exclude
+    private String key;
 
     public Category(int amount, int balance, String lastRefresh, String name, String refreshCode) {
         this.amount = amount;
@@ -60,5 +67,13 @@ public class Category {
 
     public void setRefreshCode(String refreshCode) {
         this.refreshCode = refreshCode;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
