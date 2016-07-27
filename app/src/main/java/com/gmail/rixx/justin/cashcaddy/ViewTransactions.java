@@ -100,12 +100,16 @@ public class ViewTransactions extends AppCompatActivity {
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
 
+        LinearLayoutManager llmanager = new LinearLayoutManager(this);
+        llmanager.setReverseLayout(true);
+        llmanager.setStackFromEnd(true);
+
         mRecycler.setHasFixedSize(true);
-        mRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mRecycler.setLayoutManager(llmanager);
 
         mAdapter = new FirebaseRecyclerAdapter<Transaction, TransactionHolder> (Transaction.class,
                 R.layout.transaction_recycler_item, TransactionHolder.class,
-                ref.child("transactions/" + uid).orderByChild("category").equalTo(categoryID)) {
+                ref.child("transactions/" + uid + "/" + categoryID).orderByChild("date")) {
 
             @Override
             protected void populateViewHolder(TransactionHolder viewHolder, Transaction model, int position) {
