@@ -1,15 +1,14 @@
 package com.gmail.rixx.justin.cashcaddy;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.gmail.rixx.justin.cashcaddy.model.Transaction;
@@ -113,10 +112,14 @@ public class ViewTransactions extends AppCompatActivity {
 
             @Override
             protected void populateViewHolder(TransactionHolder viewHolder, Transaction model, int position) {
-                viewHolder.setDate(model.getDate());
+                if (model.getComment().equals("")) {
+                    viewHolder.setComment(model.getDate());
+                } else {
+                    viewHolder.setComment(model.getComment());
+                }
                 viewHolder.setAmount(model.getAmount());
                 viewHolder.setBackground(position);
-                viewHolder.setClickListener(model.getComment());
+                viewHolder.setClickListener(model);
             }
         };
 
@@ -134,9 +137,9 @@ public class ViewTransactions extends AppCompatActivity {
             mView = itemView;
         }
 
-        public void setDate(String name) {
-            TextView field = (TextView) mView.findViewById(R.id.transaction_date);
-            field.setText(name);
+        public void setComment(String comment) {
+            TextView field = (TextView) mView.findViewById(R.id.transaction_comment);
+            field.setText(comment);
         }
 
         public void setAmount(int amount) {
@@ -157,13 +160,27 @@ public class ViewTransactions extends AppCompatActivity {
             }
         }
 
-        public void setClickListener(final String description) {
+        public void setClickListener(final Transaction transaction) {
             mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(),
-                            (description.equals("") ? "No description" : description),
-                            Toast.LENGTH_SHORT).show();
+                    final AppCompatDialog dialog = new AppCompatDialog(mView.getContext());
+
+                    dialog.setContentView(R.layout.dialog_transaction);
+                    TextView amount = (TextView) dialog.findViewById(R.id.amount_text_view);
+                    TextView comment = (TextView) dialog.findViewById(R.id.comment_text_view);
+
+                    NumberFormat n = NumberFormat.getCurrencyInstance(Locale.US);
+                    String s = n.format(transaction.getAmount() / 100.0);
+
+                    dialog.setTitle(transaction.getDate());
+
+                    if (amount != null && comment != null) {
+                        amount.setText(s);
+                        comment.setText(transaction.getComment());
+                    }
+
+                    dialog.show();
                 }
             });
         }
