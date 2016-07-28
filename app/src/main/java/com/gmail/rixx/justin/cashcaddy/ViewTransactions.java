@@ -8,7 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.gmail.rixx.justin.cashcaddy.model.Transaction;
@@ -169,6 +171,7 @@ public class ViewTransactions extends AppCompatActivity {
                     dialog.setContentView(R.layout.dialog_transaction);
                     TextView amount = (TextView) dialog.findViewById(R.id.amount_text_view);
                     TextView comment = (TextView) dialog.findViewById(R.id.comment_text_view);
+                    Button edit = (Button) dialog.findViewById(R.id.edit_btn);
 
                     NumberFormat n = NumberFormat.getCurrencyInstance(Locale.US);
                     String s = n.format(transaction.getAmount() / 100.0);
@@ -178,6 +181,17 @@ public class ViewTransactions extends AppCompatActivity {
                     if (amount != null && comment != null) {
                         amount.setText(s);
                         comment.setText(transaction.getComment());
+                    }
+
+                    if (edit != null) {
+                        edit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(v.getContext(), "Hello there", Toast.LENGTH_SHORT).show();
+
+                                dialog.dismiss();
+                            }
+                        });
                     }
 
                     dialog.show();

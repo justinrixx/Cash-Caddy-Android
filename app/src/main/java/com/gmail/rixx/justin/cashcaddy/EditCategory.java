@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class EditCategory extends AppCompatActivity {
 
-    private static final String EXTRA_CATEGORY = "extra_category";
+    public static final String EXTRA_CATEGORY = "extra_category";
 
     private EditText nameEdittext;
     private EditText amountEdittext;
@@ -181,7 +181,12 @@ public class EditCategory extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     if (mCategory.getKey() != null && !mCategory.getKey().equals("")) {
+                        // the category
                         mDatabase.child(C.PATH_TRANSACTIONS).child(uid).child(mCategory.getKey()).removeValue();
+
+                        // the transactions
+                        mDatabase.child(C.PATH_CATEGORIES).child(uid).child(mCategory.getKey()).removeValue();
+
                         finish();
                     } else {
                         Toast.makeText(EditCategory.this, "Error deleting category", Toast.LENGTH_SHORT).show();
@@ -205,7 +210,7 @@ public class EditCategory extends AppCompatActivity {
             nameEdittext.setText(mCategory.getName());
 
             // set the amount
-            amountEdittext.setText(String.format(java.util.Locale.US,"%.2d", mCategory.getAmount()));
+            amountEdittext.setText(String.format(java.util.Locale.US,"%.2f", mCategory.getAmount() / 100.0));
 
             // set the radio button
             switch (mCategory.getRefreshCode()) {

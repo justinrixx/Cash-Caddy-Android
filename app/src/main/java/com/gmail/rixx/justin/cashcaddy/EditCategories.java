@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
@@ -27,6 +29,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -88,6 +91,15 @@ public class EditCategories extends AppCompatActivity
                 viewHolder.setName(model.getName());
                 viewHolder.setAmount(model.getAmount());
                 viewHolder.setBackground(position);
+                viewHolder.setClickListener(model);
+            }
+
+            // so I can get the key too
+            @Override
+            protected Category parseSnapshot(DataSnapshot snapshot) {
+                Category result = super.parseSnapshot(snapshot);
+                result.setKey(snapshot.getKey());
+                return result;
             }
         };
 
@@ -255,6 +267,61 @@ public class EditCategories extends AppCompatActivity
             } else {
                 mView.setBackgroundColor(mView.getResources().getColor(R.color.stripe));
             }
+        }
+
+        public void setClickListener(final Category c) {
+            mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final AppCompatDialog dialog = new AppCompatDialog(mView.getContext());
+
+                    dialog.setContentView(R.layout.dialog_category);
+                    dialog.setTitle(c.getName());
+                    TextView amount = (TextView) dialog.findViewById(R.id.amount_text_view);
+                    TextView refresh = (TextView) dialog.findViewById(R.id.refresh_text_view);
+                    Button edit = (Button) dialog.findViewById(R.id.edit_btn);
+
+                    NumberFormat n = NumberFormat.getCurrencyInstance(Locale.US);
+                    String s = n.format(c.getAmount() / 100.0);
+
+                    String refreshCode;
+
+                    switch (c.getRefreshCode()) {
+                        case C.REFRESH_CODE_TWO_WEEKS: {
+                            refreshCode = "every two weeks";
+                            break;
+                        }
+                        case C.REFRESH_CODE_YEARLY: {
+                            refreshCode = "yearly";
+                            break;
+                        }
+                        default: {
+                            refreshCode = "monthly";
+                        }
+                    }
+
+                    if (amount != null && refresh != null) {
+                        amount.setText("Amount: " + s);
+                        refresh.setText("Refreshes " + refreshCode);
+                    }
+
+                    if (edit != null) {
+                        edit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent(v.getContext(), EditCategory.class);
+                                i.putExtra(EditCategory.EXTRA_CATEGORY, c);
+
+                                v.getContext().startActivity(i);
+
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+
+                    dialog.show();
+                }
+            });
         }
     }
 }
