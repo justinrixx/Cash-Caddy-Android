@@ -10,8 +10,19 @@
     tools:context="com.gmail.rixx.justin.cashcaddy.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <TextView
+        android:id="@+id/textview_balances"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Balances"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
+        android:layout_below="@id/textview_balances"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
