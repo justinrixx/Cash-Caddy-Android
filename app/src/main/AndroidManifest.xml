@@ -48,6 +48,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gmail.rixx.justin.cashcaddy.MainActivity" />
         </activity>
+        <activity
+            android:name=".EditCategory"
+            android:label="@string/title_activity_edit_category"
+            android:parentActivityName=".EditCategories"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gmail.rixx.justin.cashcaddy.EditCategories" />
+        </activity>
     </application>
 
 </manifest>

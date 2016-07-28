@@ -214,7 +214,7 @@ public class EditCategories extends AppCompatActivity
     }
 
     private void addCategory() {
-        Snackbar.make(fab, "Can't add categories yet", Snackbar.LENGTH_LONG).show();
+        startActivity(new Intent(this, EditCategory.class));
     }
 
     /**
