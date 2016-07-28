@@ -161,11 +161,17 @@ public class EditCategory extends AppCompatActivity {
                     double d = Double.parseDouble(amountString) * 100;
                     int amount = (int) d;
 
+                    String key;
+
+                    // overwriting an existing category or creating a new one?
+                    if (edit) {
+                        key = mCategory.getKey();
+                    } else {
+                        key = mDatabase.push().getKey();
+                    }
+
                     // construct the object and send it off to Firebase
                     Category c = new Category(amount, amount, dateString, name, refreshCode);
-
-                    String key = mDatabase.push().getKey();
-
                     Map<String, Object> updates = new HashMap<>();
                     updates.put("/" + key, c.toMap());
                     mDatabase.child(C.PATH_CATEGORIES).child(uid).updateChildren(updates);
