@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
      * Start the add transaction activity
      */
     private void addTransaction() {
-        Snackbar.make(fab, "No functionality for this yet", Snackbar.LENGTH_SHORT).show();
+        startActivity(new Intent(this, EditTransaction.class));
     }
 
     @Override

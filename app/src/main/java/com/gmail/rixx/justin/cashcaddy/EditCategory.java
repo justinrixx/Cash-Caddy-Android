@@ -163,17 +163,19 @@ public class EditCategory extends AppCompatActivity {
 
                     String key;
 
+                    Category c = new Category(amount, amount, dateString, name, refreshCode);
+                    Map<String, Object> map = c.toMap();
+
                     // overwriting an existing category or creating a new one?
                     if (edit) {
                         key = mCategory.getKey();
+                        map.remove("balance");
                     } else {
-                        key = mDatabase.push().getKey();
+                        key = mDatabase.child(C.PATH_CATEGORIES).child(uid).push().getKey();
                     }
 
-                    // construct the object and send it off to Firebase
-                    Category c = new Category(amount, amount, dateString, name, refreshCode);
                     Map<String, Object> updates = new HashMap<>();
-                    updates.put("/" + key, c.toMap());
+                    updates.put("/" + key, map);
                     mDatabase.child(C.PATH_CATEGORIES).child(uid).updateChildren(updates);
 
                     finish();
@@ -243,32 +245,5 @@ public class EditCategory extends AppCompatActivity {
                 picker.show(getSupportFragmentManager(), "Date Picker");
             }
         });
-    }
-
-    /**
-     * This is a utility class for picking dates. It should update the `TextView` with an id of
-     * `date_textview`.
-     */
-    public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-
-        @Override @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            // save the user's choice
-            ((TextView) getActivity().findViewById(R.id.date_textview))
-                    .setText(String.format(Locale.US, "%02d", month + 1) + "-" + String.format("%02d", day)
-                            + "-" + String.valueOf(year));
-        }
     }
 }
