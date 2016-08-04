@@ -204,7 +204,7 @@ public class EditCategory extends AppCompatActivity {
         }
 
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
         // set the textview to today
         if (!edit) {

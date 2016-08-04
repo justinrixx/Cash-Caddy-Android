@@ -2,6 +2,7 @@ package com.gmail.rixx.justin.cashcaddy;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,10 +29,17 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
 
 
@@ -48,9 +57,10 @@ public class MainActivity extends AppCompatActivity
     private FirebaseRecyclerAdapter mAdapter;
     private TextView emailTextView;
 
-    // auth stuff
+    // firebase stuff
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference mDatabase;
 
     private String uid;
 
@@ -127,9 +137,82 @@ public class MainActivity extends AppCompatActivity
                     uid = user.getUid();
                     setUpRecycler();
                     emailTextView.setText(user.getEmail());
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                    updateBalances();
                 }
             }
         };
+    }
+
+    private void updateBalances() {
+        mDatabase.child(C.PATH_CATEGORIES).child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (final DataSnapshot s : dataSnapshot.getChildren()) {
+                    Category c = s.getValue(Category.class);
+
+                    boolean shouldUpdate = false;
+
+                    DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
+
+                    LocalDate today = new LocalDate();
+                    LocalDate date = dtf.parseLocalDate(c.getLastRefresh());
+                    LocalDate lastRefresh = new LocalDate(c.getLastRefresh());
+
+                    switch (c.getRefreshCode()) {
+                        case C.REFRESH_CODE_TWO_WEEKS: {
+
+                            date = date.plusWeeks(2);
+                            while (today.isAfter(date)) {
+                                lastRefresh = lastRefresh.plusWeeks(2);
+                                date = date.plusWeeks(2);
+
+                                shouldUpdate = true;
+                            }
+                            break;
+                        }
+                        case C.REFRESH_CODE_YEARLY: {
+
+                            date = date.plusYears(1);
+                            while (today.isAfter(date)) {
+                                lastRefresh = lastRefresh.plusYears(1);
+                                date = date.plusYears(1);
+
+                                shouldUpdate = true;
+                            }
+                            break;
+                        }
+                        default: {
+
+                            date = date.plusMonths(1);
+                            while (today.isAfter(date)) {
+                                lastRefresh = lastRefresh.plusMonths(1);
+                                date = date.plusMonths(1);
+
+                                shouldUpdate = true;
+                            }
+                        }
+                    }
+
+                    if (shouldUpdate) {
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("lastRefresh", dtf.print(lastRefresh));
+                        mDatabase.child(C.PATH_CATEGORIES).child(uid).child(s.getKey())
+                                .updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                new UpdateBalance(s.getKey(), uid, null, mDatabase);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     /**

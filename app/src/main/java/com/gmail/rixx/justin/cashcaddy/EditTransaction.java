@@ -1,9 +1,8 @@
 package com.gmail.rixx.justin.cashcaddy;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class EditTransaction extends AppCompatActivity {
+public class EditTransaction extends AppCompatActivity implements UpdateBalanceDelegate {
 
     public static final String EXTRA_TRANSACTION = "extra_tranasction";
 
@@ -44,6 +44,7 @@ public class EditTransaction extends AppCompatActivity {
     private EditText comments;
     private Button saveBtn;
     private Button deleteBtn;
+    private ProgressBar mProgressBar;
 
     private boolean edit = false;
     private Transaction mTransaction;
@@ -69,6 +70,7 @@ public class EditTransaction extends AppCompatActivity {
         comments       = (EditText) findViewById(R.id.comments_edittext);
         saveBtn        = (Button) findViewById(R.id.btn_save);
         deleteBtn      = (Button) findViewById(R.id.btn_delete);
+        mProgressBar   = (ProgressBar) findViewById(R.id.progressBar);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -192,9 +194,8 @@ public class EditTransaction extends AppCompatActivity {
                 updates.put("/" + key, map);
                 mDatabase.child(C.PATH_TRANSACTIONS).child(uid).child(categoryId).updateChildren(updates);
 
-                // TODO update balances
-
-                finish();
+                hideEverything();
+                new UpdateBalance(categoryId, uid, EditTransaction.this, mDatabase).execute();
             }
         });
 
@@ -210,7 +211,10 @@ public class EditTransaction extends AppCompatActivity {
                                 .child(mTransaction.getKey())
                                 .removeValue();
 
-                        finish();
+                        // update balances
+                        hideEverything();
+                        new UpdateBalance(mTransaction.getCategory(), uid, EditTransaction.this, mDatabase).execute();
+                        
                     } else {
                         Toast.makeText(EditTransaction.this, "Error deleting transaction", Toast.LENGTH_SHORT).show();
                     }
@@ -219,7 +223,7 @@ public class EditTransaction extends AppCompatActivity {
         }
 
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
         // set the textview to today
         if (!edit) {
@@ -245,5 +249,25 @@ public class EditTransaction extends AppCompatActivity {
                 picker.show(getSupportFragmentManager(), "Date Picker");
             }
         });
+    }
+
+    private void hideEverything() {
+
+        mSpinner.setVisibility(View.INVISIBLE);
+        amountEditText.setVisibility(View.INVISIBLE);
+        dateTextView.setVisibility(View.INVISIBLE);
+        comments.setVisibility(View.INVISIBLE);
+        saveBtn.setVisibility(View.INVISIBLE);
+        deleteBtn.setVisibility(View.INVISIBLE);
+
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Wait to close the activity until the balance has been updated
+     */
+    @Override
+    public void onUpdateFinished() {
+        finish();
     }
 }
