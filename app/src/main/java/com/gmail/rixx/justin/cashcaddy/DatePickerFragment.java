@@ -33,7 +33,7 @@ public class DatePickerFragment extends DialogFragment
     public void onDateSet(DatePicker view, int year, int month, int day) {
         // save the user's choice
         ((TextView) getActivity().findViewById(R.id.date_textview))
-                .setText(String.format(Locale.US, "%02d", month + 1) + "-" + String.format("%02d", day)
-                        + "-" + String.valueOf(year));
+                .setText(String.valueOf(year) + "-" + String.format(Locale.US, "%02d", month + 1)
+                        + "-" + String.format("%02d", day));
     }
 }
